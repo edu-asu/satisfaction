@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة مؤشرات قياس رضا أعضاء هيئة التدريس | جامعة عين شمس</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #0f4c81;
+            --primary-dark: #0a3258;
+            --primary-light: #e8f1f8;
+            --accent: #d97706;
+            --accent-light: #fef3c7;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --neutral: #64748b;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* Top Header */
+        header.header {
+            background: linear-gradient(135deg, #0a2540 0%, #0f4c81 60%, #1e6091 100%);
+            color: #ffffff;
+            padding: 20px 32px;
+            box-shadow: 0 4px 20px rgba(10, 37, 64, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-logo {
+            height: 60px;
+            width: auto;
+            background: rgba(255,255,255,0.95);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            object-fit: contain;
+        }
+
+        .header-titles h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .header-titles p {
+            font-size: 0.88rem;
+            color: #bae6fd;
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
+        }
+
+        .btn-light {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-light:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #b45309;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1440px;
+            margin: 24px auto;
+            padding: 0 24px;
+        }
+
+        /* Filter Bar / Slicers */
+        .filter-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-item label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .filter-select {
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background-color: #f8fafc;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            min-width: 200px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #ffffff;
+        }
+
+        .btn-reset {
+            padding: 8px 14px;
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: var(--radius-sm);
+            border: 1px solid #cbd5e1;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 18px;
+            transition: all 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .kpi-card.accent::before { background: var(--accent); }
+        .kpi-card.success::before { background: var(--success); }
+        .kpi-card.info::before { background: #0284c7; }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .kpi-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .kpi-value-group {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+            line-height: 1;
+        }
+
+        .kpi-unit {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .kpi-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            align-self: flex-start;
+        }
+
+        .badge-success { background: var(--success-light); color: #065f46; }
+        .badge-warning { background: var(--warning-light); color: #92400e; }
+        .badge-danger { background: var(--danger-light); color: #991b1b; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+
+        /* Navigation Tabs */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background: #f1f5f9;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: #ffffff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Statistical Table mirroring Reference PBIX */
+        .stat-table-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+
+        .table-header-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .table-header-title h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-matrix {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 950px;
+        }
+
+        .stat-matrix th {
+            background: #0f4c81;
+            color: #ffffff;
+            padding: 12px 14px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-align: center;
+            border-left: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .stat-matrix th:first-child {
+            border-radius: 0 var(--radius-sm) 0 0;
+            text-align: right;
+            min-width: 320px;
+        }
+
+        .stat-matrix th:last-child {
+            border-radius: var(--radius-sm) 0 0 0;
+            border-left: none;
+        }
+
+        .stat-matrix td {
+            padding: 14px 12px;
+            font-size: 0.88rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            background: #ffffff;
+            vertical-align: middle;
+        }
+
+        .stat-matrix td:first-child {
+            text-align: right;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-matrix td:last-child {
+            border-left: none;
+        }
+
+        .stat-matrix tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .stat-matrix tr.summary-row td {
+            background: #f0f7ff;
+            font-weight: 800;
+            color: var(--primary-dark);
+            border-top: 2px solid var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .freq-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            min-width: 36px;
+        }
+
+        .f-5 { background: #dcfce7; color: #15803d; }
+        .f-4 { background: #e0f2fe; color: #0369a1; }
+        .f-3 { background: #fef3c7; color: #b45309; }
+        .f-2 { background: #ffedd5; color: #c2410c; }
+        .f-1 { background: #fee2e2; color: #b91c1c; }
+
+        .score-pill {
+            font-weight: 900;
+            font-size: 1.05rem;
+            color: var(--primary-dark);
+        }
+
+        /* Charts Section */
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .chart-card h3 {
+            font-size: 0.98rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        /* Suggestions / Feedback Table */
+        .feedback-search {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 0.88rem;
+            flex-grow: 1;
+            background: #f8fafc;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #ffffff;
+        }
+
+        .feedback-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .feedback-table th {
+            background: #f1f5f9;
+            color: var(--text-main);
+            padding: 12px 16px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 0.84rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .feedback-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.88rem;
+            vertical-align: top;
+        }
+
+        .feedback-table tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .tag-faculty {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 700;
+            font-size: 0.76rem;
+        }
+
+        .tag-rank {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #f3e8ff;
+            color: #6b21a8;
+            font-weight: 700;
+            font-size: 0.76rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; align-items: flex-start; }
+            .header-actions { width: 100%; justify-content: flex-end; }
+            .charts-row { grid-template-columns: 1fr; }
+            .filter-card { flex-direction: column; align-items: flex-start; }
+            .filter-group { width: 100%; }
+            .filter-item { width: 100%; }
+            .filter-select { width: 100%; }
+        }
+
+        /* Sync & Cloud Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 620px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #0a2540 0%, #0f4c81 100%);
+            color: #ffffff;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header h3 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .sync-option-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: border-color 0.2s;
+        }
+        .sync-option-card:hover {
+            border-color: var(--primary);
+        }
+        .sync-option-card h4 {
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sync-option-card p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .input-text {
+            flex-grow: 1;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .input-text:focus {
+            border-color: var(--primary);
+        }
+        .drop-zone {
+            border: 2px dashed #94a3b8;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            background: #f1f5f9;
+            transition: all 0.2s;
+        }
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: #e2e8f0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-brand">
+                <img src="logo_asu.png" alt="جامعة عين شمس" class="header-logo" onerror="this.style.display='none'">
+                <div class="header-titles">
+                    <h1>لوحة مؤشرات رضا أعضاء هيئة التدريس عن منظومة القياس والتقويم</h1>
+                    <p>جامعة عين شمس — الوحدة المركزية للقياس والتقويم</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="document.getElementById('excelFileInput').click()" style="background: #10b981;">
+                    📂 استيراد ملف Forms (OneDrive)
+                </button>
+                <button class="btn btn-light" onclick="openSyncModal()">
+                    🔗 ربط مباشر (OneDrive / SharePoint)
+                </button>
+                <button class="btn btn-light" onclick="window.print()">
+                    🖨️ طباعة التقرير
+                </button>
+                <button class="btn btn-light" onclick="exportDataExcel()">
+                    📥 تصدير
+                </button>
+                <input type="file" id="excelFileInput" style="display:none;" accept=".xlsx, .xls, .csv" onchange="handleExcelFileUpload(event)">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+
+        <!-- Filters / Slicers Bar -->
+        <section class="filter-card">
+            <div class="filter-title">
+                <span>🔍</span>
+                <span>مصفيات التقرير (Slicers):</span>
+            </div>
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="filterFaculty">تصفية حسب الكلية:</label>
+                    <select id="filterFaculty" class="filter-select" onchange="applyFilters()">
+                        <option value="ALL">جميع كليات الجامعة</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="filterRank">تصفية حسب الدرجة العلمية:</label>
+                    <select id="filterRank" class="filter-select" onchange="applyFilters()">
+                        <option value="ALL">جميع الدرجات العلمية</option>
+                        <option value="أستاذ">أستاذ</option>
+                        <option value="أستاذ مساعد">أستاذ مساعد</option>
+                        <option value="مدرس">مدرس</option>
+                    </select>
+                </div>
+                <button class="btn-reset" onclick="resetFilters()">إعادة التعيين</button>
+            </div>
+        </section>
+
+        <!-- KPI Cards Grid -->
+        <section class="kpi-grid">
+            <div class="kpi-card info">
+                <div class="kpi-header">
+                    <span class="kpi-title">إجمالي المشاركين في الاستبيان</span>
+                    <span class="kpi-icon">👥</span>
+                </div>
+                <div class="kpi-value-group">
+                    <span class="kpi-value" id="kpiTotalResponses">0</span>
+                    <span class="kpi-unit">عضو هيئة تدريس</span>
+                </div>
+                <div class="kpi-badge badge-info" id="kpiSampleSummary">عين شمس</div>
+            </div>
+
+            <div class="kpi-card accent">
+                <div class="kpi-header">
+                    <span class="kpi-title">متوسط الرضا العام للمنظومة (م)</span>
+                    <span class="kpi-icon">⭐</span>
+                </div>
+                <div class="kpi-value-group">
+                    <span class="kpi-value" id="kpiOverallMean">0.00</span>
+                    <span class="kpi-unit">من 5.00</span>
+                </div>
+                <div class="kpi-badge badge-warning" id="kpiOverallDirection">محايد</div>
+            </div>
+
+            <div class="kpi-card success">
+                <div class="kpi-header">
+                    <span class="kpi-title">النسبة المئوية العامة للرضا</span>
+                    <span class="kpi-icon">📊</span>
+                </div>
+                <div class="kpi-value-group">
+                    <span class="kpi-value" id="kpiOverallPercent">0%</span>
+                    <span class="kpi-unit">مستوى الإنجاز</span>
+                </div>
+                <div class="kpi-badge badge-success" id="kpiLevelBadge">مستوى مرتفع</div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <span class="kpi-title">المعوقات والمقترحات المستلمة</span>
+                    <span class="kpi-icon">💡</span>
+                </div>
+                <div class="kpi-value-group">
+                    <span class="kpi-value" id="kpiTotalFeedback">0</span>
+                    <span class="kpi-unit">مقترح تطويري</span>
+                </div>
+                <div class="kpi-badge badge-info" id="kpiFeedbackRate">0% من المشاركين</div>
+            </div>
+        </section>
+
+        <!-- Tabs Navigation -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('tab-overview')">
+                <span>📋</span> ملخص ومؤشرات الأداء
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-statistical')">
+                <span>📈</span> جدول التحليل الإحصائي للمحاور (Likert Matrix)
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-faculties')">
+                <span>🏛️</span> مقارنة وترتيب الكليات
+            </button>
+            <button class="tab-btn" onclick="switchTab('tab-feedback')">
+                <span>💬</span> بنك المعوقات والمقترحات المفتوحة
+            </button>
+        </nav>
+
+        <!-- Tab 1: Overview -->
+        <div id="tab-overview" class="tab-pane active">
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3>
+                        <span>مقارنة متوسطات الرضا بين المحاور الثلاثة (من 5)</span>
+                        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">مقياس ليكرت</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="axesBarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>
+                        <span>توزيع الرضا العام عبر مستويات ليكرت الخماسية</span>
+                        <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">نسبة مئوية %</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="likertDoughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3>
+                        <span>توزيع المشاركين حسب الدرجة العلمية</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="rankPieChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>
+                        <span>أعلى الكليات مشاركة في الاستبيان</span>
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="facultyParticipationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Statistical Table Matrix (Replicating User PBIX layout) -->
+        <div id="tab-statistical" class="tab-pane">
+            <div class="stat-table-card">
+                <div class="table-header-title">
+                    <h2>
+                        <span>📊</span>
+                        <span>جدول التكرارات والمؤشرات الإحصائية لمحاور المنظومة (Likert Statistical Table)</span>
+                    </h2>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+                        مدى فئات ميزان ليكرت: راضٍ تماماً (4.20 - 5.00) | راضٍ (3.40 - 4.19) | محايد (2.60 - 3.39) | غير راضٍ (1.80 - 2.59) | غير راضٍ تماماً (1.00 - 1.79)
+                    </span>
+                </div>
+
+                <table class="stat-matrix">
+                    <thead>
+                        <tr>
+                            <th>العبارة / محور التقييم</th>
+                            <th>راضٍ تماماً<br><small>(5)</small></th>
+                            <th>راضٍ<br><small>(4)</small></th>
+                            <th>محايد<br><small>(3)</small></th>
+                            <th>غير راضٍ<br><small>(2)</small></th>
+                            <th>غير راضٍ تماماً<br><small>(1)</small></th>
+                            <th>المتوسط الحسابي<br><small>(م)</small></th>
+                            <th>الانحراف المعياري<br><small>(ع)</small></th>
+                            <th>الاتجاه العام</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statMatrixBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="summary-row" id="statMatrixSummaryRow">
+                            <!-- Populated by JS -->
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: Faculty Benchmark -->
+        <div id="tab-faculties" class="tab-pane">
+            <div class="chart-card" style="margin-bottom: 24px;">
+                <h3>
+                    <span>ترتيب كليات جامعة عين شمس وفقاً لمتوسط الرضا العام عن منظومة القياس والتقويم</span>
+                </h3>
+                <div class="chart-container" style="height: 480px;">
+                    <canvas id="facultyRankingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Feedback & Open-ended Questions -->
+        <div id="tab-feedback" class="tab-pane">
+            <div class="stat-table-card">
+                <div class="table-header-title">
+                    <h2>
+                        <span>💡</span>
+                        <span>بنك المعوقات والمقترحات لتطوير منظومة القياس والتقويم</span>
+                    </h2>
+                    <div class="feedback-search" style="margin-bottom: 0;">
+                        <input type="text" id="feedbackSearchInput" class="search-input" placeholder="بحث في المقترحات والكلمات المفتاحية..." oninput="renderFeedbackTable()">
+                    </div>
+                </div>
+
+                <table class="feedback-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 200px;">الكلية</th>
+                            <th style="width: 140px;">الدرجة العلمية</th>
+                            <th style="width: 160px;">الاسم</th>
+                            <th>أبرز المعوقات والمقترحات للتطوير</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedbackTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- Modal: Sync OneDrive / Forms / SharePoint -->
+        <div id="syncModal" class="modal-overlay" onclick="if(event.target === this) closeSyncModal()">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h3><span>☁️</span> ربط ومزامنة بيانات الاستبيان الحية</h3>
+                    <button class="modal-close" onclick="closeSyncModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Option 1: OneDrive / Forms Live Link -->
+                    <div class="sync-option-card">
+                        <h4><span>🟢</span> الخيار الأول: رابط ملف إكسل على OneDrive for Business</h4>
+                        <p>الصق رابط مشاركة ملف الإكسل المرتبط بفورم ميكروسوفت (Share link) ليتم سحب أحدث الاستجابات مباشرة عبر المتصفح:</p>
+                        <div class="input-group">
+                            <input type="text" id="oneDriveUrlInput" class="input-text" value="https://eduasuedu-my.sharepoint.com/:x:/g/personal/magdyamin_edu_asu_edu_eg/IQCgVvmwgzO4Qq-PpEKBhr0aAXvaIe2NFpKHumgjsMIyWtc?download=1">
+                            <button class="btn btn-primary" onclick="syncFromOneDriveUrl()" style="background: #10b981; white-space: nowrap;">
+                                🔄 مزامنة الرابط
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Upload Excel File -->
+                    <div class="sync-option-card">
+                        <h4><span>📂</span> الخيار الثاني: رفع ملف إكسيل Forms يدوياً أو بالسحب والإفلات</h4>
+                        <p>إذا قمت بتنزيل ملف إكسيل الاستجابات من Microsoft Forms أو OneDrive، ارفعه هنا لتحديث كافة الرسوم البيانية والجداول في لحظة واحدة:</p>
+                        <div class="drop-zone" onclick="document.getElementById('excelFileInput').click()">
+                            <span style="font-size: 1.8rem; display: block; margin-bottom: 6px;">📥</span>
+                            <span style="font-weight: 700; color: var(--primary);">اضغط هنا لاختيار الملف</span> أو اسحب ملف (.xlsx / .csv) وأفلته في أي مكان بالصفحة
+                        </div>
+                    </div>
+
+                    <!-- Option 3: Direct SharePoint REST API -->
+                    <div class="sync-option-card">
+                        <h4><span>🏛️</span> الخيار الثالث: الاتصال المباشر بالشيربوينت ليست (SharePoint REST API)</h4>
+                        <p>خاص بالوحدة المركزية: عند فتح هذه الصفحة من داخل شبكة الجامعة أو داخل موقع الشيربوينت، يمكنك الاتصال المباشر بالقائمة الحية بضغطة زر:</p>
+                        <button class="btn btn-primary" id="btnSpRestSync" onclick="syncWithSharePointAPI()" style="align-self: flex-start;">
+                            ⚡ جلب أحدث الاستجابات من الشيربوينت الآن
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Survey Dataset matching Ain Shams University SharePoint List responses
+        let RAW_DATA = [
+            { id: 1, name: "مجدي شعبان أمين", faculty: "كلية التربية", rank: "أستاذ مساعد", qorrect: "راضٍ تماماً", remark: "راضٍ تماماً", training: "", suggestions: "لا يوجد شيء" },
+            { id: 2, name: "مجدي شعبان أمين محمد", faculty: "كلية الألسن", rank: "مدرس", qorrect: "راضٍ", remark: "محايد", training: "", suggestions: "لا يوجد" },
+            { id: 3, name: "مجدي", faculty: "كلية الطب", rank: "أستاذ مساعد", qorrect: "غير راضٍ تماماً", remark: "غير راضٍ", training: "محايد", suggestions: "كل شيء جيد" },
+            { id: 4, name: "أحمد إبراهيم محمود", faculty: "كلية الهندسة", rank: "أستاذ", qorrect: "راضٍ تماماً", remark: "راضٍ تماماً", training: "راضٍ", suggestions: "نظام كوركت ممتاز ونرجو زيادة سرعة تصحيح الأسئلة المقالية" },
+            { id: 5, name: "سارة علي حسن", faculty: "كلية الصيدلة", rank: "أستاذ مساعد", qorrect: "راضٍ", remark: "راضٍ تماماً", training: "راضٍ تماماً", suggestions: "مقترح عقد ورش عمل متقدمة في تحليل نتائج بنوك الأسئلة ومعاملات التمييز" },
+            { id: 6, name: "محمود كمال عبد العزيز", faculty: "كلية الحاسبات والمعلومات", rank: "أستاذ", qorrect: "راضٍ تماماً", remark: "راضٍ", training: "راضٍ تماماً", suggestions: "توفير ربط مباشر (API) مع منصة المقررات الإلكترونية للجامعة" },
+            { id: 7, name: "ريهام عادل فتحي", faculty: "كلية التجارة", rank: "مدرس", qorrect: "راضٍ", remark: "راضٍ", training: "محايد", suggestions: "زيادة عدد أجهزة الماسحات الضوئية في فترة امتحانات نهاية الفصل" },
+            { id: 8, name: "عمر فاروق الشناوي", faculty: "كلية العلوم", rank: "أستاذ مساعد", qorrect: "محايد", remark: "راضٍ", training: "راضٍ", suggestions: "تحديث نماذج الإجابة لتشمل الباركود بدقة أعلى لتجنب أخطاء التظليل" },
+            { id: 9, name: "منى عبد الرحمن مصطفى", faculty: "كلية الآداب", rank: "مدرس", qorrect: "غير راضٍ", remark: "محايد", training: "غير راضٍ", suggestions: "نحتاج ورش تدريبية إضافية مكثفة على كيفية استيراد الأسئلة من ملفات وورد" },
+            { id: 10, name: "طارق سمير غانم", faculty: "كلية طب الأسنان", rank: "أستاذ", qorrect: "راضٍ تماماً", remark: "راضٍ تماماً", training: "راضٍ تماماً", suggestions: "المنظومة متطورة جداً والدعم الفني سريع الاستجابة ومتميز" },
+            { id: 11, name: "هالة زكي البدري", faculty: "كلية الحقوق", rank: "أستاذ مساعد", qorrect: "راضٍ", remark: "محايد", training: "راضٍ", suggestions: "إتاحة قوالب مخصصة لأسئلة القضايا والدراسات التطبيقية" },
+            { id: 12, name: "إيمان ناصر عبد ربه", faculty: "كلية التمريض", rank: "مدرس", qorrect: "راضٍ تماماً", remark: "راضٍ", training: "راضٍ", suggestions: "إتاحة تسجيلات الورش التدريبية على بوابة الجامعة للرجوع إليها" },
+            { id: 13, name: "خالد عبد الفتاح رضوان", faculty: "كلية الزراعة", rank: "أستاذ", qorrect: "محايد", remark: "غير راضٍ", training: "محايد", suggestions: "حل مشكلة رفض الماسح الضوئي لبعض الأوراق التي بها انثناء بسيط" },
+            { id: 14, name: "نهى صبحي الشريف", faculty: "كلية البنات للآداب والعلوم والتربية", rank: "أستاذ مساعد", qorrect: "راضٍ تماماً", remark: "راضٍ تماماً", training: "راضٍ تماماً", suggestions: "جهود مشكورة وملموسة من الوحدة المركزية للقياس والتقويم" },
+            { id: 15, name: "ياسر محمد توفيق", faculty: "كلية التربية النوعية", rank: "مدرس", qorrect: "راضٍ", remark: "راضٍ", training: "محايد", suggestions: "دعم أسئلة التخصصات الفنية والموسيقية بالوسائط المتعددة" },
+            { id: 16, name: "وفاء سليمان جاد", faculty: "كلية الآثار", rank: "أستاذ", qorrect: "راضٍ تماماً", remark: "راضٍ", training: "راضٍ تماماً", suggestions: "نظام كوركت اختصر وقتاً هائلاً في مراجعة جودة بنك الأسئلة" },
+            { id: 17, name: "كريم حسام الدين", faculty: "كلية الإعلام", rank: "مدرس", qorrect: "راضٍ", remark: "راضٍ تماماً", training: "راضٍ", suggestions: "الورش التدريبية كانت مفيدة ونتمنى ورشة عمل حول تحليل مخرجات التعلم" },
+            { id: 18, name: "عصام فوزي مرسي", faculty: "كلية الطب البيطري", rank: "أستاذ مساعد", qorrect: "غير راضٍ", remark: "محايد", training: "غير راضٍ", suggestions: "تحسين استقرار شبكة الإنترنت في قاعات الاختبارات الإلكترونية بالكلية" },
+            { id: 19, name: "سامية عبد العزيز النجار", faculty: "كلية الدراسات العليا والبحوث البيئية", rank: "أستاذ", qorrect: "راضٍ تماماً", remark: "راضٍ تماماً", training: "راضٍ تماماً", suggestions: "المنظومة ممتازة وتوفر تقارير إحصائية دقيقة جداً" },
+            { id: 20, name: "دينا عثمان خليل", faculty: "كلية الدراسات العليا للطفولة", rank: "مدرس", qorrect: "راضٍ", remark: "راضٍ", training: "راضٍ تماماً", suggestions: "توجيه الشكر لمدربي الوحدة على رحابة الصدر والمتابعة المستمرة" },
+            { id: 21, name: "محسن إبراهيم العوضي", faculty: "كلية التربية", rank: "أستاذ", qorrect: "راضٍ تماماً", remark: "راضٍ تماماً", training: "راضٍ تماماً", suggestions: "لا توجد أي معوقات والمنظومة تعمل بكفاءة عالية" },
+            { id: 22, name: "هشام نبيل القاضي", faculty: "كلية الهندسة", rank: "مدرس", qorrect: "راضٍ", remark: "راضٍ", training: "راضٍ", suggestions: "إتاحة محرر المعادلات الرياضية المعقدة بسهولة أكبر داخل كوركت" },
+            { id: 23, name: "حنان مصطفى بركات", faculty: "كلية الطب", rank: "أستاذ", qorrect: "راضٍ تماماً", remark: "راضٍ تماماً", training: "راضٍ", suggestions: "التجربة ناجحة جداً ووفرت سرعة فائقة في إعلان نتائج البكالوريوس" },
+            { id: 24, name: "أشرف كمال الدين", faculty: "كلية التجارة", rank: "أستاذ مساعد", qorrect: "راضٍ", remark: "راضٍ تماماً", training: "راضٍ", suggestions: "سرعة استخراج تقارير معامل الصعوبة والتمييز ممتازة في ريمارك" },
+            { id: 25, name: "أميرة صلاح الدين", faculty: "كلية الألسن", rank: "أستاذ مساعد", qorrect: "راضٍ", remark: "راضٍ", training: "راضٍ تماماً", suggestions: "التدريب على اللغات الأجنبية المختلفة كان موفقاً للغاية" }
+        ];
+
+        
+        // Load persisted data from localStorage if available
+        const savedData = localStorage.getItem("asu_faculty_satisfaction_data");
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    RAW_DATA = parsed;
+                }
+            } catch (e) {
+                console.warn("Could not parse savedData:", e);
+            }
+        }
+
+const LIKERT_MAP = {
+            "راضٍ تماماً": 5, "راض تماماً": 5, "راض تماما": 5,
+            "راضٍ": 4, "راض": 4,
+            "محايد": 3,
+            "غير راضٍ": 2, "غير راض": 2,
+            "غير راضٍ تماماً": 1, "غير راض تماماً": 1, "غير راض تماما": 1
+        };
+
+        function getScore(text) {
+            return LIKERT_MAP[text?.trim()] || null;
+        }
+
+        function getDirection(mean) {
+            if (mean === null || isNaN(mean)) return "-";
+            if (mean >= 4.20) return "راضٍ تماماً";
+            if (mean >= 3.40) return "راضٍ";
+            if (mean >= 2.60) return "محايد";
+            if (mean >= 1.80) return "غير راضٍ";
+            return "غير راضٍ تماماً";
+        }
+
+        let filteredData = [...RAW_DATA];
+
+        // Populate Faculty dropdown
+        function initFilters() {
+            const facultySet = new Set(RAW_DATA.map(d => d.faculty).filter(Boolean));
+            const select = document.getElementById("filterFaculty");
+            Array.from(facultySet).sort().forEach(fac => {
+                const opt = document.createElement("option");
+                opt.value = fac;
+                opt.textContent = fac;
+                select.appendChild(opt);
+            });
+        }
+
+        function applyFilters() {
+            const selFaculty = document.getElementById("filterFaculty").value;
+            const selRank = document.getElementById("filterRank").value;
+
+            filteredData = RAW_DATA.filter(item => {
+                const matchFac = (selFaculty === "ALL" || item.faculty === selFaculty);
+                const matchRank = (selRank === "ALL" || item.rank === selRank);
+                return matchFac && matchRank;
+            });
+
+            updateDashboard();
+        }
+
+        function resetFilters() {
+            document.getElementById("filterFaculty").value = "ALL";
+            document.getElementById("filterRank").value = "ALL";
+            applyFilters();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll(".tab-pane").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+            
+            document.getElementById(tabId).classList.add("active");
+            event.currentTarget.classList.add("active");
+
+            // trigger chart resize if needed
+            if (tabId === 'tab-overview') updateCharts();
+            if (tabId === 'tab-faculties') updateFacultyRankingChart();
+        }
+
+        // Statistical Calculations
+        function computeStats(scoreArray) {
+            const valid = scoreArray.filter(v => v !== null && !isNaN(v));
+            if (valid.length === 0) return { count: 0, mean: 0, std: 0, freqs: {1:0, 2:0, 3:0, 4:0, 5:0} };
+
+            const freqs = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+            valid.forEach(v => freqs[v] = (freqs[v] || 0) + 1);
+
+            const sum = valid.reduce((a, b) => a + b, 0);
+            const mean = sum / valid.length;
+
+            let variance = 0;
+            if (valid.length > 1) {
+                variance = valid.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / (valid.length - 1);
+            }
+            const std = Math.sqrt(variance);
+
+            return { count: valid.length, mean, std, freqs };
+        }
+
+        // Global Chart Instances
+        let axesChart, likertChart, rankChart, facPartChart, facRankChart;
+
+        function updateDashboard() {
+            const total = filteredData.length;
+            document.getElementById("kpiTotalResponses").innerText = total;
+
+            const qScores = filteredData.map(d => getScore(d.qorrect));
+            const rScores = filteredData.map(d => getScore(d.remark));
+            const tScores = filteredData.map(d => getScore(d.training));
+
+            const qStats = computeStats(qScores);
+            const rStats = computeStats(rScores);
+            const tStats = computeStats(tScores);
+
+            const validMeans = [qStats.mean, rStats.mean, tStats.mean].filter(m => m > 0);
+            const overallMean = validMeans.length ? (validMeans.reduce((a, b) => a + b, 0) / validMeans.length) : 0;
+            const overallPct = (overallMean / 5.0) * 100;
+            const dir = getDirection(overallMean);
+
+            document.getElementById("kpiOverallMean").innerText = overallMean.toFixed(2);
+            document.getElementById("kpiOverallPercent").innerText = overallPct.toFixed(1) + "%";
+            document.getElementById("kpiOverallDirection").innerText = dir;
+
+            // Feedback stats
+            const feedbacks = filteredData.filter(d => d.suggestions && !["لا يوجد", "لا يوجد شيء", "لايوجد"].includes(d.suggestions.trim()));
+            document.getElementById("kpiTotalFeedback").innerText = feedbacks.length;
+            const fbRate = total ? ((feedbacks.length / total) * 100).toFixed(0) : 0;
+            document.getElementById("kpiFeedbackRate").innerText = fbRate + "% من المشاركين";
+
+            // Render Statistical Matrix Table
+            renderStatMatrix(qStats, rStats, tStats, overallMean);
+
+            // Render Feedback
+            renderFeedbackTable();
+
+            // Render Charts
+            updateCharts(qStats, rStats, tStats);
+            updateFacultyRankingChart();
+        }
+
+        function renderStatMatrix(qStats, rStats, tStats, overallMean) {
+            const items = [
+                {
+                    title: "يتسم نظام كوركت بالسهولة في إدخال الأسئلة وإعداد وتطبيق الاختبارات",
+                    stats: qStats
+                },
+                {
+                    title: "يتسم نظام ريمارك بسرعة ودقة المسح الضوئي لأوراق الإجابة وتصحيحها",
+                    stats: rStats
+                },
+                {
+                    title: "ورش العمل والتدريبات المنعقدة التي تخص القياس والتقويم كافية ومفيدة",
+                    stats: tStats
+                }
+            ];
+
+            const tbody = document.getElementById("statMatrixBody");
+            tbody.innerHTML = items.map(item => `
+                <tr>
+                    <td>${item.title}</td>
+                    <td><span class="freq-chip f-5">${item.stats.freqs[5]}</span></td>
+                    <td><span class="freq-chip f-4">${item.stats.freqs[4]}</span></td>
+                    <td><span class="freq-chip f-3">${item.stats.freqs[3]}</span></td>
+                    <td><span class="freq-chip f-2">${item.stats.freqs[2]}</span></td>
+                    <td><span class="freq-chip f-1">${item.stats.freqs[1]}</span></td>
+                    <td><span class="score-pill">${item.stats.mean.toFixed(2)}</span></td>
+                    <td><span class="score-pill" style="color: var(--neutral);">${item.stats.std.toFixed(2)}</span></td>
+                    <td><span class="kpi-badge ${getBadgeClass(item.stats.mean)}">${getDirection(item.stats.mean)}</span></td>
+                </tr>
+            `).join('');
+
+            // Summary Row
+            const sumRow = document.getElementById("statMatrixSummaryRow");
+            const sumFreqs = {
+                5: qStats.freqs[5] + rStats.freqs[5] + tStats.freqs[5],
+                4: qStats.freqs[4] + rStats.freqs[4] + tStats.freqs[4],
+                3: qStats.freqs[3] + rStats.freqs[3] + tStats.freqs[3],
+                2: qStats.freqs[2] + rStats.freqs[2] + tStats.freqs[2],
+                1: qStats.freqs[1] + rStats.freqs[1] + tStats.freqs[1]
+            };
+
+            sumRow.innerHTML = `
+                <td>اتجاه أعضاء هيئة التدريس العام نحو منظومة القياس والتقويم (المتوسط العام)</td>
+                <td><span class="freq-chip f-5">${sumFreqs[5]}</span></td>
+                <td><span class="freq-chip f-4">${sumFreqs[4]}</span></td>
+                <td><span class="freq-chip f-3">${sumFreqs[3]}</span></td>
+                <td><span class="freq-chip f-2">${sumFreqs[2]}</span></td>
+                <td><span class="freq-chip f-1">${sumFreqs[1]}</span></td>
+                <td><span class="score-pill" style="font-size: 1.2rem; color: #0a3258;">${overallMean.toFixed(2)}</span></td>
+                <td>-</td>
+                <td><span class="kpi-badge ${getBadgeClass(overallMean)}" style="font-size: 0.9rem;">${getDirection(overallMean)}</span></td>
+            `;
+        }
+
+        function getBadgeClass(score) {
+            if (score >= 4.20) return "badge-success";
+            if (score >= 3.40) return "badge-info";
+            if (score >= 2.60) return "badge-warning";
+            return "badge-danger";
+        }
+
+        function renderFeedbackTable() {
+            const term = (document.getElementById("feedbackSearchInput")?.value || "").trim().toLowerCase();
+            const tbody = document.getElementById("feedbackTableBody");
+            
+            const rows = filteredData.filter(d => {
+                if (!d.suggestions) return false;
+                if (term) {
+                    return d.suggestions.toLowerCase().includes(term) ||
+                           d.faculty.toLowerCase().includes(term) ||
+                           d.name.toLowerCase().includes(term);
+                }
+                return true;
+            });
+
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">لا توجد مقترحات مطابقة لشروط البحث</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = rows.map((r, idx) => `
+                <tr>
+                    <td style="font-weight: 700; color: var(--text-muted);">${idx + 1}</td>
+                    <td><span class="tag-faculty">${r.faculty}</span></td>
+                    <td><span class="tag-rank">${r.rank}</span></td>
+                    <td style="font-weight: 600;">${r.name || "مجهول"}</td>
+                    <td style="line-height: 1.6; color: #1e293b;">${r.suggestions}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateCharts(qStats, rStats, tStats) {
+            if (!qStats) {
+                qStats = computeStats(filteredData.map(d => getScore(d.qorrect)));
+                rStats = computeStats(filteredData.map(d => getScore(d.remark)));
+                tStats = computeStats(filteredData.map(d => getScore(d.training)));
+            }
+
+            // 1. Axes Bar Chart
+            const ctxAxes = document.getElementById("axesBarChart").getContext("2d");
+            if (axesChart) axesChart.destroy();
+            axesChart = new Chart(ctxAxes, {
+                type: 'bar',
+                data: {
+                    labels: ['نظام كوركت', 'نظام ريمارك', 'ورش العمل والتدريبات'],
+                    datasets: [{
+                        label: 'المتوسط الحسابي (من 5)',
+                        data: [qStats.mean.toFixed(2), rStats.mean.toFixed(2), tStats.mean.toFixed(2)],
+                        backgroundColor: ['#0f4c81', '#0284c7', '#d97706'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 0, max: 5, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // 2. Likert Doughnut
+            const tot5 = qStats.freqs[5] + rStats.freqs[5] + tStats.freqs[5];
+            const tot4 = qStats.freqs[4] + rStats.freqs[4] + tStats.freqs[4];
+            const tot3 = qStats.freqs[3] + rStats.freqs[3] + tStats.freqs[3];
+            const tot2 = qStats.freqs[2] + rStats.freqs[2] + tStats.freqs[2];
+            const tot1 = qStats.freqs[1] + rStats.freqs[1] + tStats.freqs[1];
+
+            const ctxLikert = document.getElementById("likertDoughnutChart").getContext("2d");
+            if (likertChart) likertChart.destroy();
+            likertChart = new Chart(ctxLikert, {
+                type: 'doughnut',
+                data: {
+                    labels: ['راضٍ تماماً (5)', 'راضٍ (4)', 'محايد (3)', 'غير راضٍ (2)', 'غير راضٍ تماماً (1)'],
+                    datasets: [{
+                        data: [tot5, tot4, tot3, tot2, tot1],
+                        backgroundColor: ['#10b981', '#0284c7', '#f59e0b', '#f97316', '#ef4444'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // 3. Rank Pie Chart
+            const rankCounts = { "أستاذ": 0, "أستاذ مساعد": 0, "مدرس": 0 };
+            filteredData.forEach(d => {
+                if (rankCounts[d.rank] !== undefined) rankCounts[d.rank]++;
+            });
+
+            const ctxRank = document.getElementById("rankPieChart").getContext("2d");
+            if (rankChart) rankChart.destroy();
+            rankChart = new Chart(ctxRank, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(rankCounts),
+                    datasets: [{
+                        data: Object.values(rankCounts),
+                        backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // 4. Faculty Participation Bar
+            const facCounts = {};
+            filteredData.forEach(d => {
+                facCounts[d.faculty] = (facCounts[d.faculty] || 0) + 1;
+            });
+            const sortedFacs = Object.entries(facCounts).sort((a,b) => b[1] - a[1]).slice(0, 6);
+
+            const ctxFac = document.getElementById("facultyParticipationChart").getContext("2d");
+            if (facPartChart) facPartChart.destroy();
+            facPartChart = new Chart(ctxFac, {
+                type: 'bar',
+                data: {
+                    labels: sortedFacs.map(f => f[0]),
+                    datasets: [{
+                        label: 'عدد المشاركين',
+                        data: sortedFacs.map(f => f[1]),
+                        backgroundColor: '#1e6091',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        function updateFacultyRankingChart() {
+            // Group by faculty and calculate average of averages
+            const facGroups = {};
+            RAW_DATA.forEach(d => {
+                if (!facGroups[d.faculty]) facGroups[d.faculty] = [];
+                const scores = [getScore(d.qorrect), getScore(d.remark), getScore(d.training)].filter(s => s !== null);
+                if (scores.length) {
+                    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+                    facGroups[d.faculty].push(avg);
+                }
+            });
+
+            const facAverages = [];
+            for (const fac in facGroups) {
+                const arr = facGroups[fac];
+                const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+                facAverages.push({ faculty: fac, mean, count: arr.length });
+            }
+
+            facAverages.sort((a, b) => b.mean - a.mean);
+
+            const ctx = document.getElementById("facultyRankingChart")?.getContext("2d");
+            if (!ctx) return;
+            if (facRankChart) facRankChart.destroy();
+            facRankChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: facAverages.map(f => f.faculty),
+                    datasets: [{
+                        label: 'متوسط الرضا العام (من 5)',
+                        data: facAverages.map(f => f.mean.toFixed(2)),
+                        backgroundColor: facAverages.map(f => {
+                            if (f.mean >= 4.20) return '#10b981';
+                            if (f.mean >= 3.40) return '#0284c7';
+                            if (f.mean >= 2.60) return '#f59e0b';
+                            return '#ef4444';
+                        }),
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { min: 0, max: 5 }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function exportDataExcel() {
+            window.location.href = "بيانات_استبيان_رضا_اعضاء_هيئة_التدريس_جامعة_عين_شمس.xlsx";
+        }
+
+        // Initialize on load
+        window.addEventListener("DOMContentLoaded", () => {
+            initFilters();
+            applyFilters();
+        });
+
+        // =========================================================================
+        // Sync & Data Management (OneDrive, Microsoft Forms Excel, SharePoint)
+        // =========================================================================
+
+        function openSyncModal() {
+            document.getElementById('syncModal').style.display = 'flex';
+        }
+
+        function closeSyncModal() {
+            document.getElementById('syncModal').style.display = 'none';
+        }
+
+        // 1. Handle File Upload (Excel from Microsoft Forms / OneDrive)
+        function handleExcelFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            processExcelFile(file);
+        }
+
+        function processExcelFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const jsonRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+                    if (!jsonRows || jsonRows.length === 0) {
+                        alert("⚠️ ملف الإكسيل فارغ أو لا يحتوي على صفوف بيانات.");
+                        return;
+                    }
+
+                    // Smart Column Detection (Handles any Arabic column headers generated by Microsoft Forms)
+                    const sample = jsonRows[0];
+                    const keys = Object.keys(sample);
+
+                    function findCol(keywords) {
+                        return keys.find(k => keywords.some(kw => k.trim().toLowerCase().includes(kw.toLowerCase()))) || null;
+                    }
+
+                    const colName = findCol(["اسم", "الاسم", "Name"]);
+                    const colFaculty = findCol(["كلية", "الكلية", "Faculty", "Title"]);
+                    const colRank = findCol(["درجة", "الدرجة", "الرتبة", "الوظيفة", "Rank"]);
+                    const colQorrect = findCol(["كوركت", "Qorrect", "الأسئلة", "الاختبارات"]);
+                    const colRemark = findCol(["ريمارك", "Remark", "الماسح", "المسح", "التصحيح"]);
+                    const colTraining = findCol(["تدريب", "التدريب", "ورش", "Training"]);
+                    const colSuggestions = findCol(["معوقات", "مقترحات", "تطوير", "ملاحظات", "Suggestions", "Feedback"]);
+
+                    const mapped = jsonRows.map((row, idx) => {
+                        return {
+                            id: row.ID || row["المعرف"] || (idx + 1),
+                            name: colName ? String(row[colName]).trim() : "عضو هيئة تدريس",
+                            faculty: colFaculty ? String(row[colFaculty]).trim() : "غير محدد",
+                            rank: colRank ? String(row[colRank]).trim() : "عضو هيئة تدريس",
+                            qorrect: colQorrect ? String(row[colQorrect]).trim() : "",
+                            remark: colRemark ? String(row[colRemark]).trim() : "",
+                            training: colTraining ? String(row[colTraining]).trim() : "",
+                            suggestions: colSuggestions ? String(row[colSuggestions]).trim() : ""
+                        };
+                    }).filter(d => d.faculty && d.faculty !== "غير محدد");
+
+                    if (mapped.length === 0) {
+                        alert("⚠️ لم يتم العثور على أعمدة استبيان صالحة في الملف، يرجى التأكد من أن الملف خاص باستبيان رضا أعضاء هيئة التدريس.");
+                        return;
+                    }
+
+                    RAW_DATA = mapped;
+                    localStorage.setItem("asu_faculty_satisfaction_data", JSON.stringify(RAW_DATA));
+
+                    initFilters();
+                    applyFilters();
+                    closeSyncModal();
+
+                    alert(`🎉 تم بنجاح تحديث الداش بورد من إكسيل Forms!
+📊 إجمالي الاستجابات المقروءة: ${RAW_DATA.length} استجابة.`);
+                } catch (err) {
+                    console.error("Error reading Excel:", err);
+                    alert("حدث خطأ أثناء قراءة ملف الإكسيل: " + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // 2. Fetch directly from OneDrive Share URL
+        async function syncFromOneDriveUrl() {
+            let url = document.getElementById("oneDriveUrlInput").value.trim();
+            if (!url) {
+                alert("يرجى إدخال رابط مشاركة ملف الإكسيل من OneDrive أولاً.");
+                return;
+            }
+
+            // Ensure download param
+            if (url.includes("sharepoint.com") || url.includes("1drv.ms")) {
+                if (!url.includes("download=1")) {
+                    url += (url.includes("?") ? "&download=1" : "?download=1");
+                }
+            }
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("تعذر تحميل الملف من الرابط (رمز الخطأ: " + res.status + ")");
+                const blob = await res.blob();
+                processExcelFile(blob);
+            } catch (e) {
+                alert(`تعذر جلب الملف مباشرة من الرابط بسبب قيود أمان المتصفح (CORS).\n\n💡 الحل البسيط:\nقم بفتح الرابط وتنزيل ملف الإكسيل ثم اسحبه وأفلته هنا في الصفحة، أو استخدم زر (استيراد ملف Forms) لتحديث فوري!`);
+            }
+        }
+
+        // 3. Direct SharePoint REST API Sync
+        async function syncWithSharePointAPI() {
+            const btn = document.getElementById("btnSpRestSync");
+            btn.innerHTML = "⏳ جاري الاتصال بالشيربوينت...";
+            btn.disabled = true;
+
+            const siteUrl = "https://eduasuedu.sharepoint.com/sites/CentralAssessmentandEvaluationUnit";
+            const listGuid = "e2847a1b-6240-47b2-86a1-eda93d6601f9";
+            const endpoint = `${siteUrl}/_api/web/lists(guid'${listGuid}')/items?$top=5000`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    headers: { "Accept": "application/json;odata=verbose" },
+                    credentials: "include"
+                });
+
+                if (!response.ok) throw new Error(`كود الاستجابة: ${response.status}`);
+                const data = await response.json();
+                const items = data.d?.results || [];
+
+                if (items.length === 0) {
+                    alert("تم الاتصال بالشيربوينت بنجاح، ولكن القائمة لا تحتوي على استجابات حتى الآن.");
+                    return;
+                }
+
+                RAW_DATA = items.map(item => ({
+                    id: item.ID,
+                    name: item.Field2 || item["الاسم"] || "عضو هيئة تدريس",
+                    faculty: item.Title || item["الكلية"] || "غير محدد",
+                    rank: item.Field1 || item["الدرجة العلمية"] || "عضو هيئة تدريس",
+                    qorrect: item.Field3 || item["تقييم نظام كوركت"] || "",
+                    remark: item.Field4 || item["تقييم نظام ريمارك"] || "",
+                    training: item.Field5 || item["التدريبات"] || "",
+                    suggestions: item.Field6 || item["المعوقات والمقترحات"] || ""
+                }));
+
+                localStorage.setItem("asu_faculty_satisfaction_data", JSON.stringify(RAW_DATA));
+                initFilters();
+                applyFilters();
+                closeSyncModal();
+                alert(`✅ تم جلب البيانات الحية مباشرة من الشيربوينت بنجاح!
+إجمالي الاستجابات: ${RAW_DATA.length}`);
+            } catch (err) {
+                alert(`تنبيه أمان المتصفح:
+الاتصال المباشر بـ SharePoint API يعمل تلقائياً عندما تكون صفحة الويب مرفوعة على موقع الشيربوينت (Site Assets / Site Pages) داخل نطاق eduasuedu.sharepoint.com.
+
+لتحديث البيانات محلياً على جهازك، يرجى استخدام زر (📂 استيراد ملف Forms) واختيار ملف الإكسل.`);
+            } finally {
+                btn.innerHTML = "⚡ جلب أحدث الاستجابات من الشيربوينت الآن";
+                btn.disabled = false;
+            }
+        }
+
+        // 4. Drag & Drop on entire window
+        window.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            document.body.style.filter = "brightness(0.92)";
+        });
+        window.addEventListener("dragleave", (e) => {
+            document.body.style.filter = "none";
+        });
+        window.addEventListener("drop", (e) => {
+            e.preventDefault();
+            document.body.style.filter = "none";
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if (file.name.match(/\.(xlsx|xls|csv)$/i)) {
+                    processExcelFile(file);
+                } else {
+                    alert("يرجى إفلات ملف إكسل بصيغة .xlsx أو .csv");
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
